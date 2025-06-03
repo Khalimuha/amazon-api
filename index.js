@@ -15,27 +15,28 @@ app.get("/", (req, res) => {
 });
 
 app.post("/payment/create", async (req, res) => {
-  const total = req.query.total;
-  if (total > 0) {
-    // console.log("payment received", total);
-    // res.send(total);
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: total,
-      currency: "usd"
-    });
-    console.log(paymentIntent);
-    res.status(201).json({
-      clientSecret: paymentIntent.client_secret
-    });
-  } else {
-    res.status(403).json({
-      message: "total must be greater than 0"
-    });
+  try {
+    const total = parseInt(req.query.total);
+    if (total > 0) {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: total,
+        currency: "usd"
+      });
+      console.log(paymentIntent);
+      res.status(201).json({
+        clientSecret: paymentIntent.client_secret
+      });
+    } else {
+      res.status(403).json({
+        message: "total must be greater than 0"
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
 });
 
-app.listen(5000, (err)=>{
-    if(err) throw err
-    console.log("Amazon server Running on PORT:5000, https://localhost:5000");
-})
-
+app.listen(5000, (err) => {
+  if (err) throw err;
+  console.log("Amazon server Running on PORT:5000, https://localhost:5000");
+});
